@@ -1,8 +1,12 @@
+######################################################
+############ DO NOT CHANGE THIS FILE! ################
+######################################################
+
 from datetime import datetime
 import json
 
 from pika import spec
-from pika.adapters.blocking_connection import BlockingChannel, BlockingConnection
+from pika.adapters.blocking_connection import BlockingChannel
 from pika.spec import BasicProperties
 
 
