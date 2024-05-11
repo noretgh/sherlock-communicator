@@ -20,8 +20,14 @@
 #
 # Best,
 # Professor M.
+import sys
+import os
 
-from messages import send_messages, receive_messages
+# Add the root directory to the Python path
+root_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(root_dir)
+
+from messages import send_messages, receive_messages, create_queue_and_binding
 from moriarty import send_clue_to_moriarty, receive_moriarty_answers
 from tools.rabbit_mq_tools import setup_connection_and_channel
 
@@ -33,19 +39,15 @@ def main() -> None:
     mq_exchange_name = "exchange_part_one"  # DO NOT CHANGE: enables the communication between both teams
 
     team_name = "team1"  # Change this value accordingly to your team: team1 or team2
-    other_team_name = "team1"  # Change this value accordingly to the other team: team1 or team2
+    other_team_name = "team2"  # Change this value accordingly to the other team: team1 or team2
 
     answer_exchange = "answer_exchange"  # Decide in which exchange you want Moriarty to answer in
     answer_routing_key = "answers"  # Decide which routing key you want Moriarty to use for the answers
 
     try:
         while True:
-            user_input = input(
-                "1 - Send Message to the other team\n"
-                "2 - Receive Message from the other team\n"
-                "3 - Send Clues to Moriarty\n"
-                "4 - Listen for Moriarty´s answer\n"
-                "Enter your choice:")
+            print_menu(team_name)
+            user_input = input("Enter your choice:")
 
             if user_input == "1":
                 # This function is already prepared and ready to use
@@ -53,7 +55,7 @@ def main() -> None:
                                     exchange_name=mq_exchange_name,
                                     sender=team_name,
                                     receiver=other_team_name):
-                    pass
+                    print("Message sent to: ", other_team_name)
 
             elif user_input == "2":
                 # This function is already prepared and ready to use
@@ -73,10 +75,22 @@ def main() -> None:
                 receive_moriarty_answers(channel=mq_channel,
                                          answer_exchange=answer_exchange,
                                          anwer_routing_key=answer_routing_key)
-            else:
+            elif user_input.lower() == "exit":
                 break
+            else:
+                print("Invalid choice. Please try again")
     finally:
         mq_connection.close()
+
+def print_menu(team_name):
+    print(
+        f"WELCOME {team_name}\n"
+        "1 - Send Message to the other team\n"
+        "2 - Receive Message from the other team\n"
+        "3 - Send Clues to Moriarty\n"
+        "4 - Listen for Moriarty´s answer\n"
+        "Type 'exit' to quit"
+    )
 
 
 if __name__ == "__main__":

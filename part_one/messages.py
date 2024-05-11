@@ -5,7 +5,7 @@
 from datetime import datetime
 import json
 
-from pika import spec
+from pika import spec, exceptions
 from pika.adapters.blocking_connection import BlockingChannel
 from pika.spec import BasicProperties
 
@@ -77,9 +77,15 @@ def receive_messages(channel: BlockingChannel,
     channel.basic_consume(queue=queue_name,
                           on_message_callback=callback_messages)
 
-    print(f"Waiting for new messages at queue {result.method.queue}")
+    print(f"Waiting for new messages at queue {queue_name}. Press Ctrl+C to stop listening.")
 
-    channel.start_consuming()
+    try:
+        channel.start_consuming()
+    except KeyboardInterrupt:
+        print("Stopped listening.")
+
+
+
 
 
 def get_current_datetime_as_string() -> str:
